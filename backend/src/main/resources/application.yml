@@ -1,0 +1,32 @@
+spring:
+  application:
+    name: brain-gym-academy-backend
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/brain_gym_academy}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:PasswordPlaceholder}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+  mail:
+    host: ${MAIL_HOST:smtp.gmail.com}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME:mohnishpathak.2011@gmail.com}
+    password: ${MAIL_PASSWORD:PasswordPlaceholder}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+app:
+  frontend:
+    url: ${FRONTEND_URL:http://localhost:3000}
+
+server:
+  port: 8080

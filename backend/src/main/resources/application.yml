@@ -5,6 +5,10 @@ spring:
     url: ${DB_URL:jdbc:postgresql://localhost:5432/brain_gym_academy}
     username: ${DB_USERNAME:postgres}
     password: ${DB_PASSWORD:PasswordPlaceholder}
+    # Hikari Connection Pool Optimizations to match Neon's serverless idling
+    hikari:
+      max-lifetime: 240000     # 4 minutes in milliseconds (cycles connections before Neon drops them)
+      keepalive-time: 60000    # 1 minute in milliseconds (regularly pings connections to keep them hot)
   jpa:
     hibernate:
       ddl-auto: update
@@ -12,17 +16,6 @@ spring:
     properties:
       hibernate:
         format_sql: true
-  mail:
-    host: ${MAIL_HOST:smtp.gmail.com}
-    port: ${MAIL_PORT:587}
-    username: ${MAIL_USERNAME:mohnishpathak.2011@gmail.com}
-    password: ${MAIL_PASSWORD:PasswordPlaceholder}
-    properties:
-      mail:
-        smtp:
-          auth: true
-          starttls:
-            enable: true
 
 app:
   frontend:

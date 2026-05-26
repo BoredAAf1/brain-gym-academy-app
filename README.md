@@ -14,7 +14,7 @@ Fresh start for a learning platform focused on:
 
 ## Deployment direction
 
-- Flutter Web on Vercel
+- Flutter Web on Firebase
 - Spring Boot API on Render / Railway / similar host
 - PostgreSQL on Neon / Supabase Postgres / Railway / Render Postgres
 

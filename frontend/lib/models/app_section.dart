@@ -5,6 +5,7 @@ enum AppSection {
   sorobanPlay,
   sorobanFormula,
   sorobanDirect,
+  worksheets,
   phonics,
   progress,
 }

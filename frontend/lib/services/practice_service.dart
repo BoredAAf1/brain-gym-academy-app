@@ -5,12 +5,22 @@ import 'package:http/http.dart' as http;
 import '../models/auth_models.dart';
 import '../models/practice_models.dart';
 import '../models/worksheet_models.dart';
+import '../models/worksheet_response.dart';
 import '../models/progress_models.dart';
 import 'api_config.dart';
 
 VerticalPrompt formatVerticalPrompt(String prompt) {
   final parts = prompt.split(' ');
   return VerticalPrompt(top: parts[0], operator: parts[1], bottom: parts[2]);
+}
+
+Future<WorksheetResponse> fetchWorksheet(String category, String type) async {
+  final response = await http.get(Uri.parse('${ApiConfig.baseUrl}/api/worksheets/$category/$type'));
+  if (response.statusCode < 200 || response.statusCode >= 300) {
+    throw Exception('Worksheet request failed.');
+  }
+
+  return WorksheetResponse.fromJson(jsonDecode(response.body) as Map<String, dynamic>);
 }
 
 int solvePrompt(String prompt) {

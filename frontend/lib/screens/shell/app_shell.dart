@@ -71,6 +71,11 @@ class AppShell extends StatelessWidget {
                             label: Text('Direct'),
                           ),
                           NavigationRailDestination(
+                            icon: Icon(Icons.calculate_outlined),
+                            selectedIcon: Icon(Icons.calculate),
+                            label: Text('Worksheets'),
+                          ),
+                          NavigationRailDestination(
                             icon: Icon(Icons.menu_book_outlined),
                             selectedIcon: Icon(Icons.menu_book),
                             label: Text('Phonics'),
@@ -128,7 +133,8 @@ class AppShell extends StatelessWidget {
       AppSection.sorobanRepresentation ||
       AppSection.sorobanPlay ||
       AppSection.sorobanFormula ||
-      AppSection.sorobanDirect => 2,
+      AppSection.sorobanDirect ||
+      AppSection.worksheets => 2,
       AppSection.phonics || AppSection.progress => 3,
     };
   }

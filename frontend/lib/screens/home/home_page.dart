@@ -19,7 +19,7 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return AppPage(
       title: 'Brain Gym Academy',
-      subtitle: 'Welcome back, ${user.name}. Use this as the clean parent dashboard for students and practice.',
+      subtitle: 'Welcome back, ${user.name}. Use this dashboard to manage students and practice sessions.',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -54,6 +54,13 @@ class HomePage extends StatelessWidget {
                 color: const Color(0xFFEBDCF8),
                 icon: Icons.auto_awesome,
                 onTap: () => onNavigate(AppSection.sorobanFormula),
+              ),
+              HeroActionCard(
+                title: 'Worksheets',
+                description: 'Abacus sums, multiplication, and division practice with the same check/reveal flow.',
+                color: const Color(0xFFDFF3FF),
+                icon: Icons.grid_view,
+                onTap: () => onNavigate(AppSection.worksheets),
               ),
             ],
           ),

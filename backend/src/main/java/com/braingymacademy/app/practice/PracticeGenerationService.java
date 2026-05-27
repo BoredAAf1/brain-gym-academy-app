@@ -11,14 +11,14 @@ public class PracticeGenerationService {
     public List<PracticeSetResponse> formulaSets() {
         return List.of(
                 new PracticeSetResponse(
-                        "Small Friend",
-                        "Worksheet-style practice using the 5-complement idea.",
-                        smallFriendQuestions()
-                ),
-                new PracticeSetResponse(
                         "Big Friend",
                         "Worksheet-style practice using the 10-complement idea.",
                         bigFriendQuestions()
+                ),
+                new PracticeSetResponse(
+                        "Small Friend",
+                        "Worksheet-style practice using the 5-complement idea.",
+                        smallFriendQuestions()
                 ),
                 new PracticeSetResponse(
                         "Combo Practice",

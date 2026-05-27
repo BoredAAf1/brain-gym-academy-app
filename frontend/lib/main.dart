@@ -14,6 +14,7 @@ import 'screens/soroban/soroban_formula_page.dart';
 import 'screens/soroban/soroban_direct_page.dart';
 import 'screens/progress/progress_page.dart';
 import 'screens/shell/app_shell.dart';
+import 'screens/soroban/worksheets_page.dart';
 import 'screens/students/students_page.dart';
 import 'widgets/app_page.dart';
 import 'widgets/abacus_visual.dart';
@@ -133,6 +134,7 @@ class _AppGateState extends State<AppGate> {
       AppSection.sorobanPlay => const SorobanPlayPage(),
       AppSection.sorobanFormula => FormulaPracticePage(parentUser: currentUser!),
       AppSection.sorobanDirect => DirectPracticePage(parentUser: currentUser!),
+      AppSection.worksheets => const WorksheetsPage(),
       AppSection.phonics => const PhonicsPage(),
       AppSection.progress => ProgressPage(parentUser: currentUser!),
     };

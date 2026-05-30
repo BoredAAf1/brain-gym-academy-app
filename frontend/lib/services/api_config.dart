@@ -5,4 +5,5 @@ class ApiConfig {
   static const String prodBaseUrl = 'https://brain-gym-academy-app.onrender.com';
 
   static String get baseUrl => useLocal ? localBaseUrl : prodBaseUrl;
+
 }

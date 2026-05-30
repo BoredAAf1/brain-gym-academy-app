@@ -38,10 +38,15 @@ public class WorksheetService {
         List<List<Integer>> questions = new ArrayList<>();
         for (int q = 0; q < questionCount; q++) {
             List<Integer> questionRow = new ArrayList<>();
-            questionRow.add(randomValue(digitLength, false));
+            int runningTotal = randomValue(digitLength, false);
+            questionRow.add(runningTotal);
             for (int c = 1; c < columns; c++) {
-                int value = randomValue(digitLength, true);
+                int value;
+                do {
+                    value = randomValue(digitLength, true);
+                } while (runningTotal + value < 0);
                 questionRow.add(value);
+                runningTotal += value;
             }
             questions.add(questionRow);
         }
@@ -55,14 +60,26 @@ public class WorksheetService {
     private int randomValue(int digitLength, boolean allowNegative) {
         int min = (int) Math.pow(10, digitLength - 1);
         int max = (int) Math.pow(10, digitLength) - 1;
-        int value = random.nextInt(max - min + 1) + min;
         if (digitLength == 1) {
-            value = random.nextInt(9) + 1;
+            min = 1;
+            max = 9;
         }
+
+        int value = random.nextInt(max - min + 1) + min;
         if (allowNegative && random.nextBoolean()) {
             value = -value;
         }
         return value;
+
+        // Previous implementation always returned a positive value even when negatives
+        // were allowed:
+        // int min = (int) Math.pow(10, digitLength - 1);
+        // int max = (int) Math.pow(10, digitLength) - 1;
+        // if (digitLength == 1) {
+        // min = 1;
+        // max = 9;
+        // }
+        // return random.nextInt(max - min + 1) + min;
     }
 
     private List<WorksheetPromptQuestion> generateMultiplicationQuestions(int topDigits, int bottomDigits, int count) {

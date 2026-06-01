@@ -4,6 +4,7 @@ import 'package:brain_gym_academy_app/models/app_section.dart';
 import 'package:brain_gym_academy_app/models/auth_models.dart';
 import 'package:brain_gym_academy_app/widgets/app_page.dart';
 import 'package:brain_gym_academy_app/widgets/hero_action_card.dart';
+import 'package:brain_gym_academy_app/screens/about_teacher_screen.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({
@@ -61,6 +62,13 @@ class HomePage extends StatelessWidget {
                 color: const Color(0xFFDFF3FF),
                 icon: Icons.grid_view,
                 onTap: () => onNavigate(AppSection.worksheets),
+              ),
+              HeroActionCard(
+                title: 'About the Teacher',
+                description: 'Learn about our founder and lead instructor.',
+                color: const Color(0xFFE8F0FF),
+                icon: Icons.school,
+                onTap: () => AboutTeacherScreen.open(context),
               ),
             ],
           ),

@@ -27,29 +27,38 @@ class AppShell extends StatelessWidget {
         final useRail = constraints.maxWidth >= 980;
 
         return Scaffold(
-          drawer: !useRail
-              ? Drawer(
-                  backgroundColor: const Color(0xFFFFE3B8),
-                  child: ListView(
-                    padding: EdgeInsets.zero,
-                    children: [
-                      DrawerHeader(
-                        decoration: const BoxDecoration(
-                          color: Color(0xFFCE6A3B),
-                        ),
-                        child: Text(
-                          'Menu',
-                          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                              ),
-                        ),
-                      ),
-                      ..._buildDrawerItems(context),
-                    ],
+          appBar: AppBar(
+            leading: Builder(
+              builder: (context) => IconButton(
+                icon: const Icon(Icons.menu),
+                onPressed: () => Scaffold.of(context).openDrawer(),
+              ),
+            ),
+            title: const Text('Brain Gym Academy'),
+            backgroundColor: const Color(0xFFCE6A3B),
+            foregroundColor: Colors.white,
+          ),
+          drawer: Drawer(
+            backgroundColor: const Color(0xFFFFE3B8),
+            child: ListView(
+              padding: EdgeInsets.zero,
+              children: [
+                DrawerHeader(
+                  decoration: const BoxDecoration(
+                    color: Color(0xFFCE6A3B),
                   ),
-                )
-              : null,
+                  child: Text(
+                    'Menu',
+                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                  ),
+                ),
+                ..._buildDrawerItems(context),
+              ],
+            ),
+          ),
           body: Column(
             children: [
               UserHeader(user: user, onLogout: onLogout),

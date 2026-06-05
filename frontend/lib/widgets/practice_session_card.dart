@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 
 import '../../models/auth_models.dart';
 import '../../models/practice_models.dart';
+import '../../models/student_models.dart';
 import '../../services/practice_service.dart';
-import 'app_page.dart';
+import '../../services/student_tracker_service.dart';
 import 'badge.dart';
 
 class PracticeSessionCard extends StatefulWidget {
@@ -13,6 +14,7 @@ class PracticeSessionCard extends StatefulWidget {
     required this.description,
     required this.questions,
     this.parentUser,
+    this.selectedStudent,
     this.progressArea,
   });
 
@@ -20,6 +22,7 @@ class PracticeSessionCard extends StatefulWidget {
   final String description;
   final List<PracticeQuestion> questions;
   final ParentUser? parentUser;
+  final StudentProfile? selectedStudent;
   final String? progressArea;
 
   @override
@@ -67,6 +70,13 @@ class _PracticeSessionCardState extends State<PracticeSessionCard> {
     });
 
     if (isCorrect) {
+      if (widget.parentUser != null && widget.selectedStudent != null && widget.progressArea != null) {
+        StudentTrackerService.recordPractice(
+          widget.parentUser!.id,
+          widget.selectedStudent!.id,
+          widget.progressArea!,
+        );
+      }
       markProgressComplete();
     }
   }
@@ -134,9 +144,21 @@ class _PracticeSessionCardState extends State<PracticeSessionCard> {
             Row(
               children: [
                 Expanded(
-                  child: Text(
-                    widget.title,
-                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        widget.title,
+                        style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+                      ),
+                      if (widget.selectedStudent != null) ...[
+                        const SizedBox(height: 6),
+                        Text(
+                          'Active learner: ${widget.selectedStudent!.name}',
+                          style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.black54),
+                        ),
+                      ],
+                    ],
                   ),
                 ),
                 AppBadge('${widget.questions.length} sums'),

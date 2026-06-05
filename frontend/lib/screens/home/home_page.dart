@@ -36,15 +36,15 @@ class HomePage extends StatelessWidget {
                 onTap: () => onNavigate(AppSection.students),
               ),
               HeroActionCard(
-                title: 'Virtual Soroban',
-                description: 'Free-play Soroban with traditional top and bottom bead behavior.',
+                title: 'Virtual Abacus',
+                description: 'Free-play Abacus with traditional top and bottom bead behavior.',
                 color: const Color(0xFFFFE0CC),
                 icon: Icons.tune,
                 onTap: () => onNavigate(AppSection.sorobanPlay),
               ),
               HeroActionCard(
                 title: '0 to 99 Numbers',
-                description: 'See Soroban representations for every number from 0 to 99.',
+                description: 'See Abacus representations for every number from 0 to 99.',
                 color: const Color(0xFFFFF0D1),
                 icon: Icons.looks_one,
                 onTap: () => onNavigate(AppSection.sorobanRepresentation),

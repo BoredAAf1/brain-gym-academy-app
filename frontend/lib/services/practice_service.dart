@@ -15,7 +15,10 @@ VerticalPrompt formatVerticalPrompt(String prompt) {
 }
 
 Future<WorksheetResponse> fetchWorksheet(String category, String type) async {
-  final response = await http.get(Uri.parse('${ApiConfig.baseUrl}/api/worksheets/$category/$type'));
+  final response = await http.get(
+    ApiConfig.freshUri('/api/worksheets/$category/$type'),
+    headers: ApiConfig.noCacheHeaders(),
+  );
   if (response.statusCode < 200 || response.statusCode >= 300) {
     throw Exception('Worksheet request failed.');
   }
@@ -32,7 +35,10 @@ int solvePrompt(String prompt) {
 }
 
 Future<List<PracticeSet>> fetchFormulaPracticeSets() async {
-  final response = await http.get(Uri.parse('${ApiConfig.baseUrl}/api/practice/formula'));
+  final response = await http.get(
+    ApiConfig.freshUri('/api/practice/formula'),
+    headers: ApiConfig.noCacheHeaders(),
+  );
   if (response.statusCode < 200 || response.statusCode >= 300) {
     throw Exception('Formula practice request failed.');
   }
@@ -42,7 +48,10 @@ Future<List<PracticeSet>> fetchFormulaPracticeSets() async {
 }
 
 Future<DirectPracticeData> fetchDirectPractice() async {
-  final response = await http.get(Uri.parse('${ApiConfig.baseUrl}/api/practice/direct'));
+  final response = await http.get(
+    ApiConfig.freshUri('/api/practice/direct'),
+    headers: ApiConfig.noCacheHeaders(),
+  );
   if (response.statusCode < 200 || response.statusCode >= 300) {
     throw Exception('Direct practice request failed.');
   }
@@ -52,8 +61,8 @@ Future<DirectPracticeData> fetchDirectPractice() async {
 
 Future<List<UserProgressSummary>> fetchProgress(ParentUser parentUser) async {
   final response = await http.get(
-    Uri.parse('${ApiConfig.baseUrl}/api/progress'),
-    headers: authHeaders(parentUser),
+    ApiConfig.freshUri('/api/progress'),
+    headers: ApiConfig.noCacheHeaders(authHeaders(parentUser)),
   );
   if (response.statusCode < 200 || response.statusCode >= 300) {
     throw Exception('Progress request failed.');

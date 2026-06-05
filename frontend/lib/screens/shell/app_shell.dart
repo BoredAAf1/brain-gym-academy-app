@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:brain_gym_academy_app/models/app_section.dart';
 import 'package:brain_gym_academy_app/models/auth_models.dart';
+import 'package:brain_gym_academy_app/models/student_models.dart';
 import 'package:brain_gym_academy_app/widgets/user_header.dart';
 
 class AppShell extends StatelessWidget {
@@ -9,12 +10,14 @@ class AppShell extends StatelessWidget {
     super.key,
     required this.user,
     required this.selectedSection,
+    required this.activeStudent,
     required this.onNavigate,
     required this.currentPage,
     required this.onLogout,
   });
 
   final ParentUser user;
+  final StudentProfile? activeStudent;
   final AppSection selectedSection;
   final ValueChanged<AppSection> onNavigate;
   final Widget currentPage;
@@ -61,7 +64,7 @@ class AppShell extends StatelessWidget {
           ),
           body: Column(
             children: [
-              UserHeader(user: user, onLogout: onLogout),
+              UserHeader(user: user, onLogout: onLogout, activeStudent: activeStudent),
               Expanded(
                 child: Row(
                   children: [
@@ -90,7 +93,7 @@ class AppShell extends StatelessWidget {
                           NavigationRailDestination(
                             icon: Icon(Icons.tune_outlined),
                             selectedIcon: Icon(Icons.tune),
-                            label: Text('Soroban'),
+                            label: Text('Abacus'),
                           ),
                           NavigationRailDestination(
                             icon: Icon(Icons.auto_awesome_outlined),
@@ -144,7 +147,7 @@ class AppShell extends StatelessWidget {
                     NavigationDestination(
                       icon: Icon(Icons.tune_outlined),
                       selectedIcon: Icon(Icons.tune),
-                      label: 'Soroban',
+                      label: 'Abacus',
                     ),
                     NavigationDestination(
                       icon: Icon(Icons.menu_book_outlined),
@@ -163,7 +166,7 @@ class AppShell extends StatelessWidget {
       ('Home', Icons.home, AppSection.home),
       ('Students', Icons.people, AppSection.students),
       ('0-99', Icons.looks_one, AppSection.sorobanRepresentation),
-      ('Soroban', Icons.tune, AppSection.sorobanRepresentation),
+      ('Abacus', Icons.tune, AppSection.sorobanRepresentation),
       ('Formula', Icons.auto_awesome, AppSection.sorobanFormula),
       ('Direct', Icons.quiz, AppSection.sorobanDirect),
       ('Worksheets', Icons.calculate, AppSection.worksheets),

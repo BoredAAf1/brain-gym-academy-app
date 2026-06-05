@@ -1,10 +1,12 @@
 import 'dart:convert';
+// ignore: avoid_web_libraries_in_flutter
 import 'dart:html' as html;
 
 import 'package:flutter/material.dart';
 
 import 'models/app_section.dart';
 import 'models/auth_models.dart';
+import 'models/student_models.dart';
 import 'screens/auth/auth.dart';
 import 'screens/home/home_page.dart';
 import 'screens/phonics/phonics_page.dart';
@@ -16,10 +18,7 @@ import 'screens/progress/progress_page.dart';
 import 'screens/shell/app_shell.dart';
 import 'screens/soroban/worksheets_page.dart';
 import 'screens/students/students_page.dart';
-import 'widgets/app_page.dart';
-import 'widgets/abacus_visual.dart';
-import 'widgets/badge.dart';
-import 'widgets/info_banner.dart';
+import 'services/student_tracker_service.dart';
 
 void main() {
   runApp(const BrainGymAcademyApp());
@@ -56,6 +55,8 @@ class AppGate extends StatefulWidget {
 
 class _AppGateState extends State<AppGate> {
   ParentUser? currentUser;
+  StudentProfile? activeStudent;
+  int? activeStudentId;
   bool isRestoring = true;
   AppSection selectedSection = AppSection.home;
 
@@ -81,8 +82,12 @@ class _AppGateState extends State<AppGate> {
 
     try {
       final decoded = jsonDecode(raw) as Map<String, dynamic>;
+      final user = ParentUser.fromJson(decoded);
+      final restoredStudent = StudentTrackerService.restoreActiveStudentProfile(user.id);
       setState(() {
-        currentUser = ParentUser.fromJson(decoded);
+        currentUser = user;
+        activeStudent = restoredStudent;
+        activeStudentId = restoredStudent?.id;
         isRestoring = false;
       });
     } catch (_) {
@@ -98,12 +103,15 @@ class _AppGateState extends State<AppGate> {
 
   Future<void> handleLogin(ParentUser user) async {
     html.window.localStorage['logged_in_parent_user'] = jsonEncode(user.toJson());
+    final restoredStudent = StudentTrackerService.restoreActiveStudentProfile(user.id);
 
     if (!mounted) {
       return;
     }
     setState(() {
       currentUser = user;
+      activeStudent = restoredStudent;
+      activeStudentId = restoredStudent?.id;
       isRestoring = false;
     });
   }
@@ -116,6 +124,8 @@ class _AppGateState extends State<AppGate> {
     }
     setState(() {
       currentUser = null;
+      activeStudent = null;
+      activeStudentId = null;
       isRestoring = false;
     });
   }
@@ -126,17 +136,43 @@ class _AppGateState extends State<AppGate> {
     });
   }
 
+  void updateActiveStudent(StudentProfile? student) {
+    if (currentUser == null) {
+      return;
+    }
+
+    if (student == null) {
+      StudentTrackerService.clearActiveStudentId(currentUser!.id);
+    } else {
+      StudentTrackerService.saveActiveStudent(currentUser!.id, student);
+    }
+
+    if (!mounted) {
+      return;
+    }
+
+    setState(() {
+      activeStudent = student;
+      activeStudentId = student?.id;
+    });
+  }
+
   Widget _buildCurrentPage() {
     return switch (selectedSection) {
       AppSection.home => HomePage(user: currentUser!, onNavigate: navigate),
-      AppSection.students => StudentsPage(parentUser: currentUser!),
+      AppSection.students => StudentsPage(
+          parentUser: currentUser!,
+          activeStudentId: activeStudentId,
+          activeStudent: activeStudent,
+          onSelectedStudentChanged: updateActiveStudent,
+        ),
       AppSection.sorobanRepresentation => const SorobanRepresentationPage(),
-      AppSection.sorobanPlay => const SorobanPlayPage(),
-      AppSection.sorobanFormula => FormulaPracticePage(parentUser: currentUser!),
-      AppSection.sorobanDirect => DirectPracticePage(parentUser: currentUser!),
-      AppSection.worksheets => const WorksheetsPage(),
+      AppSection.sorobanPlay => SorobanPlayPage(selectedStudent: activeStudent),
+      AppSection.sorobanFormula => FormulaPracticePage(parentUser: currentUser!, selectedStudent: activeStudent),
+      AppSection.sorobanDirect => DirectPracticePage(parentUser: currentUser!, selectedStudent: activeStudent),
+      AppSection.worksheets => WorksheetsPage(selectedStudent: activeStudent),
       AppSection.phonics => const PhonicsPage(),
-      AppSection.progress => ProgressPage(parentUser: currentUser!),
+      AppSection.progress => ProgressPage(parentUser: currentUser!, selectedStudent: activeStudent),
     };
   }
 
@@ -157,6 +193,7 @@ class _AppGateState extends State<AppGate> {
     return AppShell(
       user: currentUser!,
       selectedSection: selectedSection,
+      activeStudent: activeStudent,
       onNavigate: navigate,
       currentPage: _buildCurrentPage(),
       onLogout: handleLogout,

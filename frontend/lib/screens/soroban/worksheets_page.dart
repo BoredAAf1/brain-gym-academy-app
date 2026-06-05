@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../models/worksheet_models.dart';
+import '../../models/student_models.dart';
 import '../../models/worksheet_response.dart';
 import '../../services/practice_service.dart';
 import '../../widgets/app_page.dart';
@@ -73,7 +73,9 @@ const List<WorksheetType> worksheetTypes = [
 ];
 
 class WorksheetsPage extends StatefulWidget {
-  const WorksheetsPage({super.key});
+  const WorksheetsPage({super.key, this.selectedStudent});
+
+  final StudentProfile? selectedStudent;
 
   @override
   State<WorksheetsPage> createState() => _WorksheetsPageState();
@@ -196,7 +198,9 @@ class _WorksheetsPageState extends State<WorksheetsPage> {
   Widget build(BuildContext context) {
     return AppPage(
       title: 'Worksheet Practice',
-      subtitle: 'Choose a worksheet type and practice with check, reveal, and next controls.',
+      subtitle: widget.selectedStudent != null
+          ? 'Hands-on worksheet practice for ${widget.selectedStudent!.name}.'
+          : 'Choose a worksheet type and practice with check, reveal, and next controls.',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

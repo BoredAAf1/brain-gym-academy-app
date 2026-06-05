@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
 
 import '../models/auth_models.dart';
+import '../models/student_models.dart';
 
 class UserHeader extends StatelessWidget {
   const UserHeader({
     super.key,
     required this.user,
     required this.onLogout,
+    this.activeStudent,
   });
 
   final ParentUser user;
   final VoidCallback onLogout;
+  final StudentProfile? activeStudent;
 
   @override
   Widget build(BuildContext context) {
@@ -23,9 +26,27 @@ class UserHeader extends StatelessWidget {
           const Icon(Icons.account_circle, color: Colors.white, size: 32),
           const SizedBox(width: 10),
           Expanded(
-            child: Text(
-              '${user.name} • ${user.email} • ${formatRole(user.role)}',
-              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '${user.name} • ${user.email} • ${formatRole(user.role)}',
+                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+                ),
+                if (activeStudent != null) ...[
+                  const SizedBox(height: 6),
+                  Row(
+                    children: [
+                      const Icon(Icons.school, color: Colors.white70, size: 16),
+                      const SizedBox(width: 6),
+                      Text(
+                        'Active learner: ${activeStudent!.name}',
+                        style: const TextStyle(color: Colors.white70, fontWeight: FontWeight.w500),
+                      ),
+                    ],
+                  ),
+                ],
+              ],
             ),
           ),
           TextButton.icon(

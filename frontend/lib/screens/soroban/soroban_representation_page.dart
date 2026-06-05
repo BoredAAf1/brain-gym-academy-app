@@ -16,7 +16,7 @@ class SorobanRepresentationPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return AppPage(
       title: '0 to 99 Representation',
-      subtitle: 'Every number is shown using tens and ones on the Soroban.',
+      subtitle: 'Every number is shown using tens and ones on the Abacus.',
       child: Wrap(
         spacing: 12,
         runSpacing: 12,

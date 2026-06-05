@@ -141,7 +141,7 @@ class _LoginPageState extends State<LoginPage> {
                     const SizedBox(height: 10),
                     Text(
                       isRegisterMode
-                          ? 'Create a parent account to start student profiles, Soroban practice, and phonics.'
+                          ? 'Create a parent account to start student profiles, Abacus practice, and phonics.'
                           : 'Sign in to continue to the parent dashboard.',
                       style: Theme.of(context).textTheme.titleMedium,
                     ),

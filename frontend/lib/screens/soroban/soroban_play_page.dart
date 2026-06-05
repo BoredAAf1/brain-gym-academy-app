@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 
+import '../../models/student_models.dart';
 import '../../widgets/app_page.dart';
 import '../../widgets/abacus_visual.dart';
 import '../../widgets/metric_widgets.dart';
 import '../../widgets/rod_control_card.dart';
 
 class SorobanPlayPage extends StatefulWidget {
-  const SorobanPlayPage({super.key});
+  const SorobanPlayPage({super.key, this.selectedStudent});
+
+  final StudentProfile? selectedStudent;
 
   @override
   State<SorobanPlayPage> createState() => _SorobanPlayPageState();
@@ -33,8 +36,10 @@ class _SorobanPlayPageState extends State<SorobanPlayPage> {
   @override
   Widget build(BuildContext context) {
     return AppPage(
-      title: 'Virtual Soroban',
-      subtitle: 'Free-play the traditional Japanese abacus with tens and ones rods.',
+      title: 'Virtual Abacus',
+      subtitle: widget.selectedStudent != null
+          ? 'Free-play for ${widget.selectedStudent!.name} on the traditional Japanese abacus.'
+          : 'Free-play the traditional Japanese abacus with tens and ones rods.',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

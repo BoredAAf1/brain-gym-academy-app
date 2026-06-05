@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../models/auth_models.dart';
+import '../../models/student_models.dart';
 import '../../models/worksheet_models.dart';
 import '../../services/practice_service.dart';
 import '../../widgets/app_page.dart';
@@ -10,9 +11,10 @@ import '../../widgets/worksheet_section.dart';
 import '../../widgets/practice_session_card.dart';
 
 class DirectPracticePage extends StatefulWidget {
-  const DirectPracticePage({super.key, required this.parentUser});
+  const DirectPracticePage({super.key, required this.parentUser, this.selectedStudent});
 
   final ParentUser parentUser;
+  final StudentProfile? selectedStudent;
 
   @override
   State<DirectPracticePage> createState() => _DirectPracticePageState();
@@ -36,8 +38,8 @@ class _DirectPracticePageState extends State<DirectPracticePage> {
   @override
   Widget build(BuildContext context) {
     return AppPage(
-      title: 'Direct Soroban Worksheet',
-      subtitle: 'Beginner arithmetic for students who know only direct Soroban moves.',
+      title: 'Direct Abacus Practice',
+      subtitle: 'Beginner arithmetic for students who know only direct Abacus moves.',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -85,6 +87,7 @@ class _DirectPracticePageState extends State<DirectPracticePage> {
                     description: 'Interactive direct-only practice with one active question at a time.',
                     questions: data.practiceBank,
                     parentUser: widget.parentUser,
+                    selectedStudent: widget.selectedStudent,
                     progressArea: 'DIRECT_SUMS',
                   ),
                 ],

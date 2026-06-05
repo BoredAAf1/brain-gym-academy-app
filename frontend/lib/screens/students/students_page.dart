@@ -6,13 +6,23 @@ import 'package:http/http.dart' as http;
 import 'package:brain_gym_academy_app/models/auth_models.dart';
 import 'package:brain_gym_academy_app/models/student_models.dart';
 import 'package:brain_gym_academy_app/services/api_config.dart';
+import 'package:brain_gym_academy_app/services/student_tracker_service.dart';
 import 'package:brain_gym_academy_app/widgets/app_page.dart';
 import 'package:brain_gym_academy_app/widgets/info_banner.dart';
 
 class StudentsPage extends StatefulWidget {
-  const StudentsPage({super.key, required this.parentUser});
+  const StudentsPage({
+    super.key,
+    required this.parentUser,
+    this.activeStudentId,
+    this.activeStudent,
+    required this.onSelectedStudentChanged,
+  });
 
   final ParentUser parentUser;
+  final int? activeStudentId;
+  final StudentProfile? activeStudent;
+  final ValueChanged<StudentProfile?> onSelectedStudentChanged;
 
   @override
   State<StudentsPage> createState() => _StudentsPageState();
@@ -24,6 +34,7 @@ class _StudentsPageState extends State<StudentsPage> {
   final levelController = TextEditingController(text: 'Beginner');
 
   List<StudentProfile> students = const [];
+  StudentProfile? activeStudent;
   bool isLoading = true;
   bool isSaving = false;
   String? error;
@@ -31,7 +42,16 @@ class _StudentsPageState extends State<StudentsPage> {
   @override
   void initState() {
     super.initState();
+    activeStudent = widget.activeStudent;
     fetchStudents();
+  }
+
+  @override
+  void didUpdateWidget(covariant StudentsPage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.activeStudentId != oldWidget.activeStudentId || widget.activeStudent?.id != oldWidget.activeStudent?.id) {
+      activeStudent = widget.activeStudent;
+    }
   }
 
   @override
@@ -49,8 +69,8 @@ class _StudentsPageState extends State<StudentsPage> {
     });
 
     try {
-      final uri = Uri.parse('${ApiConfig.baseUrl}/api/students');
-      final response = await http.get(uri, headers: _authHeaders());
+      final uri = ApiConfig.freshUri('/api/students');
+      final response = await http.get(uri, headers: ApiConfig.noCacheHeaders(_authHeaders()));
       final data = response.body.isNotEmpty ? jsonDecode(response.body) : [];
 
       if (response.statusCode >= 200 && response.statusCode < 300) {
@@ -59,6 +79,12 @@ class _StudentsPageState extends State<StudentsPage> {
             .toList();
         setState(() {
           students = list;
+          if (widget.activeStudentId != null) {
+            final persisted = students.where((student) => student.id == widget.activeStudentId).toList();
+            if (persisted.isNotEmpty) {
+              activeStudent = persisted.first;
+            }
+          }
         });
       } else {
         setState(() {
@@ -97,7 +123,7 @@ class _StudentsPageState extends State<StudentsPage> {
 
     try {
       final response = await http.post(
-        Uri.parse('${ApiConfig.baseUrl}/api/students'),
+        ApiConfig.freshUri('/api/students'),
         headers: {
           'Content-Type': 'application/json',
           ..._authHeaders(),
@@ -143,6 +169,30 @@ class _StudentsPageState extends State<StudentsPage> {
     return {
       'Authorization': 'Bearer ${widget.parentUser.token}',
     };
+  }
+
+  void selectStudent(StudentProfile student) {
+    if (!mounted) {
+      return;
+    }
+    setState(() {
+      activeStudent = student;
+    });
+    widget.onSelectedStudentChanged(student);
+  }
+
+  List<String> studentRecommendations(StudentProfile student) {
+    return student.recommendations.isNotEmpty
+        ? student.recommendations
+        : const ['Practice should focus on Abacus fluency, using Direct and Formula drills first.'];
+  }
+
+  String studentPracticeSummary(StudentProfile student) {
+    final snapshot = StudentTrackerService.snapshot(widget.parentUser.id, student.id);
+    if (snapshot.totalSessions == 0) {
+      return 'No tracked practice sessions yet.';
+    }
+    return '${snapshot.totalSessions} practice session${snapshot.totalSessions == 1 ? '' : 's'} tracked, top focus ${snapshot.topArea}.';
   }
 
   @override
@@ -231,7 +281,7 @@ class _StudentsPageState extends State<StudentsPage> {
             const InfoBanner(
               lines: [
                 'No student profiles yet.',
-                'Add your first learner above to organize Soroban and phonics practice.',
+                'Add your first learner above to organize Abacus and phonics practice.',
               ],
             )
           else
@@ -241,22 +291,72 @@ class _StudentsPageState extends State<StudentsPage> {
               children: students
                   .map(
                     (student) => SizedBox(
-                      width: 280,
+                      width: 320,
                       child: Card(
+                        elevation: activeStudent?.id == student.id ? 4 : 1,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          side: BorderSide(
+                            color: activeStudent?.id == student.id ? const Color(0xFF2F7D6E) : Colors.transparent,
+                            width: 2,
+                          ),
+                        ),
                         child: Padding(
                           padding: const EdgeInsets.all(18),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
-                                student.name,
-                                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                      fontWeight: FontWeight.bold,
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      student.name,
+                                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                            fontWeight: FontWeight.bold,
+                                          ),
                                     ),
+                                  ),
+                                  if (activeStudent?.id == student.id)
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFF2F7D6E),
+                                        borderRadius: BorderRadius.circular(999),
+                                      ),
+                                      child: const Text(
+                                        'Active learner',
+                                        style: TextStyle(color: Colors.white, fontSize: 12),
+                                      ),
+                                    ),
+                                ],
                               ),
                               const SizedBox(height: 8),
                               Text('Age: ${student.age}'),
                               Text('Level: ${student.level}'),
+                              const SizedBox(height: 14),
+                              Text(
+                                studentPracticeSummary(student),
+                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.black87),
+                              ),
+                              const SizedBox(height: 12),
+                              Wrap(
+                                spacing: 8,
+                                runSpacing: 8,
+                                children: studentRecommendations(student)
+                                    .map((recommendation) => Chip(
+                                          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                          label: Text(
+                                            recommendation,
+                                            style: const TextStyle(fontSize: 12),
+                                          ),
+                                        ))
+                                    .toList(),
+                              ),
+                              const SizedBox(height: 12),
+                              FilledButton(
+                                onPressed: activeStudent?.id == student.id ? null : () => selectStudent(student),
+                                child: Text(activeStudent?.id == student.id ? 'Selected' : 'Set Active Learner'),
+                              ),
                             ],
                           ),
                         ),

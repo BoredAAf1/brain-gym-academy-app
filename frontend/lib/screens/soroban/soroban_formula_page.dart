@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../models/auth_models.dart';
 import '../../models/practice_models.dart';
+import '../../models/student_models.dart';
 import '../../services/practice_service.dart';
 import '../../widgets/app_page.dart';
 import '../../widgets/info_banner.dart';
@@ -9,9 +10,10 @@ import '../../widgets/load_error_card.dart';
 import '../../widgets/practice_session_card.dart';
 
 class FormulaPracticePage extends StatefulWidget {
-  const FormulaPracticePage({super.key, required this.parentUser});
+  const FormulaPracticePage({super.key, required this.parentUser, this.selectedStudent});
 
   final ParentUser parentUser;
+  final StudentProfile? selectedStudent;
 
   @override
   State<FormulaPracticePage> createState() => _FormulaPracticePageState();
@@ -75,8 +77,7 @@ class _FormulaPracticePageState extends State<FormulaPracticePage> {
                           title: set.title,
                           description: set.description,
                           questions: set.questions,
-                          parentUser: widget.parentUser,
-                          progressArea: 'FORMULA_PRACTICE',
+                          parentUser: widget.parentUser,                          selectedStudent: widget.selectedStudent,                          progressArea: 'FORMULA_PRACTICE',
                         ),
                       ),
                     )

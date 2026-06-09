@@ -26,9 +26,18 @@ class LoadErrorCard extends StatelessWidget {
                   ),
             ),
             const SizedBox(height: 8),
-            const Text('Please check your connection and try again.'),
+            const Text('Server is waking up. This can take up to 60 seconds.'),
             const SizedBox(height: 12),
-            FilledButton(onPressed: onRetry, child: const Text('Retry')),
+            SizedBox(
+              width: double.infinity,
+              child: FilledButton(
+                onPressed: onRetry,
+                child: const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 12),
+                  child: Text('Try again'),
+                ),
+              ),
+            ),
           ],
         ),
       ),

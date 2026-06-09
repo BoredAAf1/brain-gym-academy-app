@@ -95,7 +95,7 @@ class _PracticeSessionCardState extends State<PracticeSessionCard> {
         return;
       }
       setState(() {
-        feedback = 'Correct. Progress will sync when the connection is available.';
+        feedback = 'Correct. Server is waking up. This can take up to 60 seconds.';
       });
     }
   }

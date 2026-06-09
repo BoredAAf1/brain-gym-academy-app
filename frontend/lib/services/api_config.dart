@@ -1,10 +1,14 @@
 class ApiConfig {
-  static const bool useLocal = false;
+  static const Duration requestTimeout = Duration(seconds: 10);
 
   static const String localBaseUrl = 'http://localhost:8080';
   static const String prodBaseUrl = 'https://brain-gym-academy-app.onrender.com';
 
-  static String get baseUrl => useLocal ? localBaseUrl : prodBaseUrl;
+  static String get baseUrl {
+    final host = Uri.base.host;
+    final isLocalFrontend = host == 'localhost' || host == '127.0.0.1' || host.isEmpty;
+    return isLocalFrontend ? localBaseUrl : prodBaseUrl;
+  }
 
   static Uri freshUri(String path, [Map<String, String>? queryParameters]) {
     final mergedQuery = {

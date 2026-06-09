@@ -18,6 +18,7 @@ import 'screens/progress/progress_page.dart';
 import 'screens/shell/app_shell.dart';
 import 'screens/soroban/worksheets_page.dart';
 import 'screens/students/students_page.dart';
+import 'services/backend_status_service.dart';
 import 'services/student_tracker_service.dart';
 
 void main() {
@@ -58,6 +59,8 @@ class _AppGateState extends State<AppGate> {
   StudentProfile? activeStudent;
   int? activeStudentId;
   bool isRestoring = true;
+  bool isBackendWaking = false;
+  bool isCheckingBackend = false;
   AppSection selectedSection = AppSection.home;
 
   @override
@@ -90,6 +93,7 @@ class _AppGateState extends State<AppGate> {
         activeStudentId = restoredStudent?.id;
         isRestoring = false;
       });
+      warmUpPracticeServer();
     } catch (_) {
       html.window.localStorage.remove('logged_in_parent_user');
       if (!mounted) {
@@ -114,6 +118,7 @@ class _AppGateState extends State<AppGate> {
       activeStudentId = restoredStudent?.id;
       isRestoring = false;
     });
+    warmUpPracticeServer();
   }
 
   Future<void> handleLogout() async {
@@ -127,7 +132,37 @@ class _AppGateState extends State<AppGate> {
       activeStudent = null;
       activeStudentId = null;
       isRestoring = false;
+      isBackendWaking = false;
     });
+  }
+
+  Future<void> warmUpPracticeServer() async {
+    if (isCheckingBackend) {
+      return;
+    }
+
+    setState(() {
+      isCheckingBackend = true;
+      isBackendWaking = true;
+    });
+
+    final isReady = await warmUpBackend();
+    if (!mounted || currentUser == null) {
+      return;
+    }
+
+    setState(() {
+      isCheckingBackend = false;
+      isBackendWaking = !isReady;
+    });
+
+    if (!isReady) {
+      Future<void>.delayed(const Duration(seconds: 10), () {
+        if (mounted && currentUser != null && isBackendWaking) {
+          warmUpPracticeServer();
+        }
+      });
+    }
   }
 
   void navigate(AppSection section) {
@@ -194,6 +229,9 @@ class _AppGateState extends State<AppGate> {
       user: currentUser!,
       selectedSection: selectedSection,
       activeStudent: activeStudent,
+      isBackendWaking: isBackendWaking,
+      isCheckingBackend: isCheckingBackend,
+      onRetryBackendWake: warmUpPracticeServer,
       onNavigate: navigate,
       currentPage: _buildCurrentPage(),
       onLogout: handleLogout,

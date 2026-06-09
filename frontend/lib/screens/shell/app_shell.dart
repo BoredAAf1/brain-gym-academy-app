@@ -11,6 +11,9 @@ class AppShell extends StatelessWidget {
     required this.user,
     required this.selectedSection,
     required this.activeStudent,
+    required this.isBackendWaking,
+    required this.isCheckingBackend,
+    required this.onRetryBackendWake,
     required this.onNavigate,
     required this.currentPage,
     required this.onLogout,
@@ -18,7 +21,10 @@ class AppShell extends StatelessWidget {
 
   final ParentUser user;
   final StudentProfile? activeStudent;
+  final bool isBackendWaking;
+  final bool isCheckingBackend;
   final AppSection selectedSection;
+  final VoidCallback onRetryBackendWake;
   final ValueChanged<AppSection> onNavigate;
   final Widget currentPage;
   final VoidCallback onLogout;
@@ -65,6 +71,38 @@ class AppShell extends StatelessWidget {
           body: Column(
             children: [
               UserHeader(user: user, onLogout: onLogout, activeStudent: activeStudent),
+              if (isBackendWaking)
+                Material(
+                  color: const Color(0xFFFFF0D1),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                    child: Row(
+                      children: [
+                        if (isCheckingBackend)
+                          const SizedBox(
+                            width: 18,
+                            height: 18,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        else
+                          const SizedBox(width: 18, height: 18),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            isCheckingBackend
+                                ? 'Starting practice server...'
+                                : 'Server is waking up. This can take up to 60 seconds.',
+                          ),
+                        ),
+                        if (!isCheckingBackend)
+                          TextButton(
+                            onPressed: onRetryBackendWake,
+                            child: const Text('Try again'),
+                          ),
+                      ],
+                    ),
+                  ),
+                ),
               Expanded(
                 child: Row(
                   children: [

@@ -76,7 +76,7 @@ class _LoginPageState extends State<LoginPage> {
           'Content-Type': 'application/json',
         },
         body: jsonEncode(payload),
-      );
+      ).timeout(ApiConfig.requestTimeout);
 
       final data = response.body.isNotEmpty
           ? jsonDecode(response.body) as Map<String, dynamic>
@@ -99,7 +99,7 @@ class _LoginPageState extends State<LoginPage> {
       }
     } catch (_) {
       setState(() {
-        error = 'Could not connect. Please try again in a moment.';
+        error = 'Server is waking up. Please try Login again after 60 seconds.';
       });
     } finally {
       if (mounted) {
@@ -179,6 +179,10 @@ class _LoginPageState extends State<LoginPage> {
                         error!,
                         style: const TextStyle(color: Color(0xFFB3261E)),
                       ),
+                    ],
+                    if (isLoading) ...[
+                      const SizedBox(height: 12),
+                      const Text('Server is waking up. Please try Login again after 60 seconds.'),
                     ],
                     const SizedBox(height: 18),
                     SizedBox(

@@ -72,6 +72,15 @@ class _DirectPracticePageState extends State<DirectPracticePage> {
               final data = snapshot.data!;
               return Column(
                 children: [
+                  PracticeSessionCard(
+                    title: 'Direct Practice Bank',
+                    description: 'Interactive direct-only practice with one active question at a time.',
+                    questions: data.practiceBank,
+                    parentUser: widget.parentUser,
+                    selectedStudent: widget.selectedStudent,
+                    progressArea: 'DIRECT_SUMS',
+                  ),
+                  const SizedBox(height: 18),
                   ...data.sections.map(
                     (section) => Padding(
                       padding: const EdgeInsets.only(bottom: 18),
@@ -80,15 +89,6 @@ class _DirectPracticePageState extends State<DirectPracticePage> {
                         questions: section.questions,
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 6),
-                  PracticeSessionCard(
-                    title: 'Direct Practice Bank',
-                    description: 'Interactive direct-only practice with one active question at a time.',
-                    questions: data.practiceBank,
-                    parentUser: widget.parentUser,
-                    selectedStudent: widget.selectedStudent,
-                    progressArea: 'DIRECT_SUMS',
                   ),
                 ],
               );

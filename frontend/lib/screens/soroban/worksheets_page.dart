@@ -5,7 +5,6 @@ import '../../models/worksheet_response.dart';
 import '../../services/practice_service.dart';
 import '../../widgets/app_page.dart';
 import '../../widgets/info_banner.dart';
-import '../../widgets/load_error_card.dart';
 
 class WorksheetType {
   const WorksheetType({
@@ -83,7 +82,9 @@ class WorksheetsPage extends StatefulWidget {
 
 class _WorksheetsPageState extends State<WorksheetsPage> {
   late WorksheetType selectedType;
-  late Future<WorksheetResponse> worksheetFuture;
+  late WorksheetResponse worksheet;
+  bool isRemoteSyncing = false;
+  bool remoteSyncFailed = false;
   int currentIndex = 0;
   int attempted = 0;
   int correct = 0;
@@ -96,7 +97,8 @@ class _WorksheetsPageState extends State<WorksheetsPage> {
   void initState() {
     super.initState();
     selectedType = worksheetTypes.first;
-    worksheetFuture = fetchWorksheet(selectedType.category, selectedType.type);
+    worksheet = generateLocalWorksheet(selectedType.category, selectedType.type);
+    _syncRemoteWorksheet(selectedType);
   }
 
   @override
@@ -109,6 +111,9 @@ class _WorksheetsPageState extends State<WorksheetsPage> {
     if (type.type == selectedType.type) return;
     setState(() {
       selectedType = type;
+      worksheet = generateLocalWorksheet(type.category, type.type);
+      isRemoteSyncing = false;
+      remoteSyncFailed = false;
       currentIndex = 0;
       attempted = 0;
       correct = 0;
@@ -116,21 +121,39 @@ class _WorksheetsPageState extends State<WorksheetsPage> {
       revealed = false;
       feedback = null;
       answerController.clear();
-      worksheetFuture = fetchWorksheet(type.category, type.type);
     });
+    _syncRemoteWorksheet(type);
   }
 
   void retry() {
+    _syncRemoteWorksheet(selectedType);
+  }
+
+  Future<void> _syncRemoteWorksheet(WorksheetType type) async {
     setState(() {
-      worksheetFuture = fetchWorksheet(selectedType.category, selectedType.type);
-      currentIndex = 0;
-      attempted = 0;
-      correct = 0;
-      answeredCurrent = false;
-      revealed = false;
-      feedback = null;
-      answerController.clear();
+      isRemoteSyncing = true;
+      remoteSyncFailed = false;
     });
+
+    try {
+      final remoteWorksheet = await fetchWorksheet(type.category, type.type);
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        worksheet = remoteWorksheet;
+        isRemoteSyncing = false;
+        remoteSyncFailed = false;
+      });
+    } catch (_) {
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        isRemoteSyncing = false;
+        remoteSyncFailed = true;
+      });
+    }
   }
 
   void checkAnswer(WorksheetResponse worksheet) {
@@ -229,26 +252,21 @@ class _WorksheetsPageState extends State<WorksheetsPage> {
             style: Theme.of(context).textTheme.bodyLarge,
           ),
           const SizedBox(height: 18),
-          FutureBuilder<WorksheetResponse>(
-            future: worksheetFuture,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState != ConnectionState.done) {
-                return const Center(
-                  child: Padding(
-                    padding: EdgeInsets.all(24),
-                    child: CircularProgressIndicator(),
-                  ),
-                );
-              }
-
-              if (snapshot.hasError || !snapshot.hasData) {
-                return LoadErrorCard(
-                  message: 'Could not load worksheet.',
-                  onRetry: retry,
-                );
-              }
-
-              final worksheet = snapshot.data!;
+          if (isRemoteSyncing || remoteSyncFailed)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: Text(
+                isRemoteSyncing
+                    ? 'Loading latest worksheet content from the server…'
+                    : 'Using local worksheet content while the server wakes up.',
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: const Color(0xFF2F7D6E),
+                      fontStyle: FontStyle.italic,
+                    ),
+              ),
+            ),
+          Builder(
+            builder: (context) {
               final questionCount = worksheet.rows;
               final progress = (currentIndex + 1) / questionCount;
               final scorePercent = attempted == 0 ? 0 : ((correct / attempted) * 100).round();
